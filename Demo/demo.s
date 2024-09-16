@@ -87,7 +87,7 @@ nmi:  ;WHENEVER AN NMI INTERRUPT OCCURS, THE PROGRAM JUMPS HERE (60fps)
 @loop:	lda hello, x 	; Load the hello message into SPR-RAM one by one, the pointer is increased every time a byte is written. Sprites are referenced by using the third byte of the 4-byte arrays in "hello"
   sta $2004
   inx
-  cpx #$24            ;ATTENTION: if you add more letters, you must increase this number by 4 per each additional letter. This is the limit for the sprite memory copy routine
+  cpx #$38            ;ATTENTION: if you add more letters, you must increase this number by 4 per each additional letter. This is the limit for the sprite memory copy routine
   bne @loop
   rti
 
@@ -102,6 +102,13 @@ hello:
   .byte $6c, $05, $00, $9E  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
   .byte $6c, $06, $00, $A8  ; Y=$6c(108), Sprite=06(L), Palette=00, X=%A8(168)
 
+  .byte $76, $07, $01, $76  ; Y=$6c(108), Sprite=06(V), Palette=00, X=%B2(108)
+  .byte $76, $04, $00, $80  ; Y=$6c(108), Sprite=04(I), Palette=00, X=%94(148)
+  .byte $76, $05, $00, $8A  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
+  .byte $76, $03, $00, $94  ; Y=$6c(108), Sprite=03(R), Palette=00, X=%8A(138)
+  .byte $76, $01, $00, $9E  ; Y=$6c(108), Sprite=01(A), Palette=00, X=%76(118)
+
+
 
   ; YOU CAN ADD MORE LETTERS IN THIS SPACE BUT REMEMBER TO INCREASE THE "cpx" ARGUMENT THAT DEFINES WHERE TO STOP LOADING SPRITES
 
@@ -113,8 +120,8 @@ palettes: ;The first color should always be the same accross all the palettes. M
   .byte $0f, $00, $00, $00
 
   ; Sprite Palette  %notice that the first palette contains the white color in the second element
-  .byte $0f, $20, $17, $19
-  .byte $0f, $23, $00, $00
+  .byte $0f, $20, $17, $2B
+  .byte $0f, $23, $24, $29  
   .byte $0f, $00, $00, $00
   .byte $0f, $00, $00, $00
 
@@ -128,7 +135,24 @@ palettes: ;The first color should always be the same accross all the palettes. M
   .byte %11000011
   .byte %11111111
   .byte %11111111
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
+
+  .byte %11111111	; G (00)
+  .byte %11111111
+  .byte %11000000
+  .byte %11011111
+  .byte %11011111
+  .byte %11000011
+  .byte %11111111
+  .byte %11111111
+
+  .byte %00000000	; A (01)
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
 
   .byte %11111111	; A (01)
   .byte %11111111
@@ -138,7 +162,8 @@ palettes: ;The first color should always be the same accross all the palettes. M
   .byte %11111111
   .byte %11000011
   .byte %11000011
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
+  
+
 
   .byte %11111110	; B (02)
   .byte %11000111
@@ -189,3 +214,22 @@ palettes: ;The first color should always be the same accross all the palettes. M
   .byte %11111111
   .byte %11111111
   .byte $00, $00, $00, $00, $00, $00, $00, $00
+
+  .byte %11000011	; V (07)
+  .byte %11000011
+  .byte %11000011
+  .byte %00000000
+  .byte %00000000
+  .byte %11100111
+  .byte %01111110
+  .byte %00111100
+
+  .byte %11000011	; V (07)
+  .byte %11000011
+  .byte %11000011
+  .byte %11000011
+  .byte %11000011
+  .byte %11100111
+  .byte %01111110
+  .byte %00111100
+
