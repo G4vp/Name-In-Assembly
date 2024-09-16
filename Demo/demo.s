@@ -83,33 +83,30 @@ forever: ;FOREVER LOOP WAITING FOR THEN NMI INTERRUPT, WHICH OCCURS WHENEVER THE
 
 nmi:  ;WHENEVER AN NMI INTERRUPT OCCURS, THE PROGRAM JUMPS HERE (60fps)
   ldx #$00 	; Set SPR-RAM address to 0
-  stx $2003 ;Sets the PPU-RAM pointer to $2003 to start receiving sprite information saved under the tag "hello"
-@loop:	lda hello, x 	; Load the hello message into SPR-RAM one by one, the pointer is increased every time a byte is written. Sprites are referenced by using the third byte of the 4-byte arrays in "hello"
+  stx $2003 ;Sets the PPU-RAM pointer to $2003 to start receiving sprite information saved under the tag "name"
+@loop:	lda name, x 	; Load the name message into SPR-RAM one by one, the pointer is increased every time a byte is written. Sprites are referenced by using the third byte of the 4-byte arrays in "name"
   sta $2004
   inx
   cpx #$38            ;ATTENTION: if you add more letters, you must increase this number by 4 per each additional letter. This is the limit for the sprite memory copy routine
   bne @loop
   rti
 
-hello:
+name:
   .byte $00, $00, $00, $00 	; DO NOT MODIFY THESE
-  .byte $00, $00, $00, $00  ; DO NOT MODIFY THESE
+  .byte $00, $00, $01, $00  ; DO NOT MODIFY THESE
   .byte $6c, $00, $00, $6c  ; Y=$6c(108), Sprite=00(G), Palette=00, X=%6c(108)
-  .byte $6c, $01, $00, $76  ; Y=$6c(108), Sprite=01(A), Palette=00, X=%76(118)
+  .byte $6c, $01, $01, $76  ; Y=$6c(108), Sprite=01(A), Palette=00, X=%76(118)
   .byte $6c, $02, $00, $80  ; Y=$6c(108), Sprite=02(B), Palette=00, X=%80(128)
-  .byte $6c, $03, $00, $8A  ; Y=$6c(108), Sprite=03(R), Palette=00, X=%8A(138)
+  .byte $6c, $03, $01, $8A  ; Y=$6c(108), Sprite=03(R), Palette=00, X=%8A(138)
   .byte $6c, $04, $00, $94  ; Y=$6c(108), Sprite=04(I), Palette=00, X=%94(148)
-  .byte $6c, $05, $00, $9E  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
+  .byte $6c, $05, $01, $9E  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
   .byte $6c, $06, $00, $A8  ; Y=$6c(108), Sprite=06(L), Palette=00, X=%A8(168)
 
-  .byte $76, $07, $01, $76  ; Y=$6c(108), Sprite=06(V), Palette=00, X=%B2(108)
-  .byte $76, $04, $00, $80  ; Y=$6c(108), Sprite=04(I), Palette=00, X=%94(148)
-  .byte $76, $05, $00, $8A  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
-  .byte $76, $03, $00, $94  ; Y=$6c(108), Sprite=03(R), Palette=00, X=%8A(138)
-  .byte $76, $01, $00, $9E  ; Y=$6c(108), Sprite=01(A), Palette=00, X=%76(118)
-
-
-
+  .byte $76, $07, $00, $76  ; Y=$76(118), Sprite=07(V), Palette=00, X=%B2(118)
+  .byte $76, $04, $01, $80  ; Y=$76(118), Sprite=04(I), Palette=01, X=%94(128)
+  .byte $76, $05, $00, $8A  ; Y=$76(118), Sprite=05(E), Palette=00, X=%9E(138)
+  .byte $76, $03, $01, $94  ; Y=$76(118), Sprite=03(R), Palette=01, X=%8A(148)
+  .byte $76, $01, $00, $9E  ; Y=$76(118), Sprite=01(A), Palette=00, X=%76(158)
   ; YOU CAN ADD MORE LETTERS IN THIS SPACE BUT REMEMBER TO INCREASE THE "cpx" ARGUMENT THAT DEFINES WHERE TO STOP LOADING SPRITES
 
 palettes: ;The first color should always be the same accross all the palettes. MOdify this section to determine which colors you'd like to use
@@ -120,116 +117,146 @@ palettes: ;The first color should always be the same accross all the palettes. M
   .byte $0f, $00, $00, $00
 
   ; Sprite Palette  %notice that the first palette contains the white color in the second element
-  .byte $0f, $20, $17, $2B
-  .byte $0f, $23, $24, $29  
-  .byte $0f, $00, $00, $00
-  .byte $0f, $00, $00, $00
+  .byte $0f, $21, $11, $01
+  .byte $0f, $25, $15, $05  
+  .byte $0f, $29, $19, $09
+  .byte $0f, $24, $14, $04
 
 ; Character memory
 .segment "CHARS"
-  .byte %11111111	; G (00)
-  .byte %11111111
-  .byte %11000000
-  .byte %11011111
-  .byte %11011111
-  .byte %11000011
-  .byte %11111111
-  .byte %11111111
-
-  .byte %11111111	; G (00)
-  .byte %11111111
-  .byte %11000000
-  .byte %11011111
-  .byte %11011111
-  .byte %11000011
-  .byte %11111111
-  .byte %11111111
-
-  .byte %00000000	; A (01)
-  .byte %00000000
-  .byte %00000000
-  .byte %00000000
-  .byte %00000000
-  .byte %00000000
-  .byte %00000000
-  .byte %00000000
-
-  .byte %11111111	; A (01)
-  .byte %11111111
-  .byte %11000011
-  .byte %11000011
-  .byte %11111111
-  .byte %11111111
-  .byte %11000011
-  .byte %11000011
-  
-
-
-  .byte %11111110	; B (02)
-  .byte %11000111
-  .byte %11000011
-  .byte %11111110
-  .byte %11111110
-  .byte %11000011
-  .byte %11000111
-  .byte %11111110
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
-
-  .byte %11111110	; R (03)
-  .byte %11000011
-  .byte %11000011
-  .byte %11111110
-  .byte %11111110
-  .byte %11000011
-  .byte %11000011
-  .byte %11000011
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
-
-  .byte %11111111	; I (04)
-  .byte %11111111
-  .byte %00111100
-  .byte %00111100
-  .byte %00111100
-  .byte %00111100
-  .byte %11111111
-  .byte %11111111
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
-
-  .byte %11111111	; E (05)
-  .byte %11111111
-  .byte %11000000
-  .byte %11111111
-  .byte %11111111
-  .byte %11000000
-  .byte %11111111
-  .byte %11111111
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
-
-  .byte %11000000	; L (06)
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11000000
-  .byte %11111111
-  .byte %11111111
-  .byte $00, $00, $00, $00, $00, $00, $00, $00
-
-  .byte %11000011	; V (07)
-  .byte %11000011
-  .byte %11000011
-  .byte %00000000
-  .byte %00000000
-  .byte %11100111
+  .byte %00111110	; G (00)
   .byte %01111110
-  .byte %00111100
-
-  .byte %11000011	; V (07)
-  .byte %11000011
-  .byte %11000011
-  .byte %11000011
-  .byte %11000011
-  .byte %11100111
+  .byte %01100000
+  .byte %01101110
+  .byte %01100010
+  .byte %00111110
+  .byte %01000000
+  .byte %00111110
+  .byte %00000000
+  .byte %00000000
+  .byte %00011110
+  .byte %00010000
+  .byte %00011100
+  .byte %01000000
   .byte %01111110
+  .byte %00111110
+
+  .byte %00111100	; A (01)
+  .byte %01111110
+  .byte %01100110
+  .byte %01100110
+  .byte %01111110
+  .byte %01100110
+  .byte %00011000
+  .byte %01100110
+  .byte %00000000
+  .byte %00000000
+  .byte %00011000
+  .byte %00011000
+  .byte %00000000
+  .byte %00011000
+  .byte %01111110
+  .byte %01100110
+
+  .byte %01111100	; B (02)
+  .byte %01100110
+  .byte %01100100
+  .byte %01111110
+  .byte %01100110
+  .byte %01111100
+  .byte %00000010
+  .byte %01111100
+  .byte %00000000
+  .byte %00011000
+  .byte %00011000
+  .byte %00000000
+  .byte %00011000
+  .byte %00000010
+  .byte %01111110
+  .byte %01111100
+
+  .byte %00111110	; R (03)
+  .byte %01100110
+  .byte %01100100
+  .byte %01111100
+  .byte %01100110
+  .byte %01100110
+  .byte %00011000
+  .byte %01100110
+  .byte %00000000	
+  .byte %00011000
+  .byte %00011000
+  .byte %00000000
+  .byte %00011000
+  .byte %00011000
+  .byte %01111110
+  .byte %01100110
+
+  .byte %01111110	; I (04)
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %00011000
+  .byte %01111110
+  .byte %00000000
+  .byte %01111110
+  .byte %00000000	
+  .byte %01100110
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %01111110
+  .byte %01111110
+
+  .byte %00111110	; E (05)
+  .byte %01111110
+  .byte %01100000
+  .byte %01111110
+  .byte %01100000
+  .byte %00111110
+  .byte %01000000
+  .byte %00111110
+  .byte %00000000	
+  .byte %00000000
+  .byte %00011110
+  .byte %00000000
+  .byte %00011110
+  .byte %01000000
+  .byte %01111110
+  .byte %00111110
+
+  .byte %01100000; L (06)
+  .byte %01100000
+  .byte %01100000
+  .byte %01100000
+  .byte %01100010
+  .byte %01111110
+  .byte %00000000
+  .byte %01111110
+  .byte %00000000	
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %01111110
+  .byte %01111110
+
+  .byte %01100110	; V (07)
+  .byte %01100110
+  .byte %01100110
+  .byte %00100100
   .byte %00111100
+  .byte %01011010
+  .byte %00100100
+  .byte %00011000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %01011010
+  .byte %01000010
+  .byte %01100110
+  .byte %00111100
+  .byte %00011000
 
