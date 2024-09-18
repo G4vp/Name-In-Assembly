@@ -43,15 +43,6 @@ reset:
   stx $2001 	; disable rendering
   stx $4010 	; disable DMC IRQs
 
-;; first wait for vblank to make sure PPU is ready
-; vblankwait1:
-;   bit PPUSTATUS
-;   bpl vblankwait1
-;   LDA #%10010000  ; turn on NMIs, sprites use first pattern table
-;   STA PPUCTRL
-;   LDA #%00011110  ; turn on screen
-;   STA PPUMASK
-
 clear_memory:
   lda #$00
   sta $0000, x
@@ -85,22 +76,10 @@ load_palettes:
 
   LDX #$00
 
-; enable_rendering: ; DO NOT MODIFY THIS
-;   lda #%10000000	; Enable NMI
-;   sta $2000
-;   lda #%00010000	; Enable Sprites
-;   sta $2001
-
-load_sprites:	
-  lda name, x 	; Load the name message into SPR-RAM one by one, the pointer is increased every time a byte is written. Sprites are referenced by using the third byte of the 4-byte arrays in "name"
-  sta $0200,x
-  inx
-  cpx #$10            ;ATTENTION: if you add more letters, you must increase this number by 4 per each additional letter. This is the limit for the sprite memory copy routine
-  bne load_sprites
-
+load_tiles:	
   	; write nametables
-	; big stars first
-	LDA PPUSTATUS
+	; write letters in background
+	LDA PPUSTATUS ; G
 	LDA #$21
 	STA PPUADDR
 	LDA #$E7
@@ -108,7 +87,7 @@ load_sprites:
 	LDX #$0A
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; A
 	LDA #$21
 	STA PPUADDR
 	LDA #$E8
@@ -116,7 +95,7 @@ load_sprites:
 	LDX #$04
 	STX PPUDATA
 	
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; B
 	LDA #$21
 	STA PPUADDR
 	LDA #$E9
@@ -124,7 +103,7 @@ load_sprites:
 	LDX #$05
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; R
 	LDA #$21
 	STA PPUADDR
 	LDA #$EA
@@ -132,7 +111,7 @@ load_sprites:
 	LDX #$15
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; I
 	LDA #$21
 	STA PPUADDR
 	LDA #$EB
@@ -140,7 +119,7 @@ load_sprites:
 	LDX #$0C
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; E
 	LDA #$21
 	STA PPUADDR
 	LDA #$EC
@@ -148,7 +127,7 @@ load_sprites:
 	LDX #$08
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; L
 	LDA #$21
 	STA PPUADDR
 	LDA #$ED
@@ -156,7 +135,7 @@ load_sprites:
 	LDX #$0F
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; V
 	LDA #$21
 	STA PPUADDR
 	LDA #$F1
@@ -164,7 +143,7 @@ load_sprites:
 	LDX #$19
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; I
 	LDA #$21
 	STA PPUADDR
 	LDA #$F2
@@ -172,7 +151,7 @@ load_sprites:
 	LDX #$0C
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; E
 	LDA #$21
 	STA PPUADDR
 	LDA #$F3
@@ -180,7 +159,7 @@ load_sprites:
 	LDX #$08
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ; R
 	LDA #$21
 	STA PPUADDR
 	LDA #$F4
@@ -188,7 +167,7 @@ load_sprites:
 	LDX #$15
 	STX PPUDATA
 
-	LDA PPUSTATUS
+	LDA PPUSTATUS ;A
 	LDA #$21
 	STA PPUADDR
 	LDA #$F5
@@ -196,7 +175,7 @@ load_sprites:
 	LDX #$04
 	STX PPUDATA
 
-	; finally, attribute table
+	; Attribute table
 	LDA PPUSTATUS
 	LDA #$23
 	STA PPUADDR
@@ -229,60 +208,35 @@ load_sprites:
 	LDA #%00010000
 	STA PPUDATA
 
-;; second wait for vblank, PPU is ready after this
-vblankwait:
+vblankwait: ; wait for another vblank before continuing
   bit PPUSTATUS
   bpl vblankwait
+
   LDA #%10010000  ; turn on NMIs, sprites use first pattern table
   STA PPUCTRL
   LDA #%00011110  ; turn on screen
   STA PPUMASK
 
-forever: ;FOREVER LOOP WAITING FOR THEN NMI INTERRUPT, WHICH OCCURS WHENEVER THE LAST PIXEL IN THE BOTTOM RIGHT CORNER IS PROJECTED
+forever:
   jmp forever
 .endproc
 
 .segment "VECTORS"
-  ;; When an NMI happens (once per frame if enabled) the label nmi:
   .addr nmi_handler, reset, irq_handler
-  ;; When the processor first turns on or is reset, it will jump to the label reset:
-
-  ;; External interrupt IRQ (unused)
-
 
 .segment "RODATA"
-palettes: ;The first color should always be the same accross all the palettes. MOdify this section to determine which colors you'd like to use
-  ; Background Palette % all black and gray
-	.byte $0f, $12, $23, $27
-	.byte $0f, $2b, $3c, $39
-	.byte $0f, $0c, $07, $13
-	.byte $0f, $19, $09, $29
+palettes: 
+  ; Background Palette
+  .byte $0f, $12, $23, $27
+  .byte $0f, $2b, $3c, $39
+  .byte $0f, $0c, $07, $13
+  .byte $0f, $19, $09, $29
 
   ; Sprite Palette  %notice that the first palette contains the white color in the second element
   .byte $0f, $21, $11, $01
   .byte $0f, $25, $15, $05  
   .byte $0f, $29, $19, $09
   .byte $0f, $24, $14, $04
-
-name:
-  ; .byte $6c, $00, $00, $6c  ; Y=$6c(108), Sprite=00(G), Palette=00, X=%6c(108)
-  ; .byte $6c, $01, $01, $76  ; Y=$6c(108), Sprite=01(A), Palette=00, X=%76(118)
-  ; .byte $6c, $02, $00, $80  ; Y=$6c(108), Sprite=02(B), Palette=00, X=%80(128)
-  ; .byte $6c, $03, $01, $8A  ; Y=$6c(108), Sprite=03(R), Palette=00, X=%8A(138)
-  ; .byte $6c, $04, $00, $94  ; Y=$6c(108), Sprite=04(I), Palette=00, X=%94(148)
-  ; .byte $6c, $05, $01, $9E  ; Y=$6c(108), Sprite=05(E), Palette=00, X=%9E(158)
-  ; .byte $6c, $06, $00, $A8  ; Y=$6c(108), Sprite=06(L), Palette=00, X=%A8(168)
-
-  ; .byte $76, $07, $00, $76  ; Y=$76(118), Sprite=07(V), Palette=00, X=%B2(118)
-  ; .byte $76, $04, $01, $80  ; Y=$76(118), Sprite=04(I), Palette=01, X=%94(128)
-  ; .byte $76, $05, $00, $8A  ; Y=$76(118), Sprite=05(E), Palette=00, X=%9E(138)
-  ; .byte $76, $03, $01, $94  ; Y=$76(118), Sprite=03(R), Palette=01, X=%8A(148)
-  ; .byte $76, $01, $00, $9E  ; Y=$76(118), Sprite=01(A), Palette=00, X=%76(158)
-
-;   .byte $70, $05, $00, $80
-;   .byte $70, $06, $00, $88
-;   .byte $78, $07, $00, $80
-;   .byte $78, $08, $00, $88
 
 .segment "CHR"
 .incbin "starfield.chr"
