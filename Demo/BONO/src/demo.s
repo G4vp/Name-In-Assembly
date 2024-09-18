@@ -82,106 +82,114 @@ load_tiles:
 	LDA PPUSTATUS ; G
 	LDA #$21
 	STA PPUADDR
-	LDA #$E7
+	LDA #$A3
 	STA PPUADDR
-	LDX #$0A
+	LDX #$01
 	STX PPUDATA
 
 	LDA PPUSTATUS ; A
 	LDA #$21
 	STA PPUADDR
-	LDA #$E8
+	LDA #$A5
 	STA PPUADDR
-	LDX #$04
+	LDX #$02
 	STX PPUDATA
 	
 	LDA PPUSTATUS ; B
 	LDA #$21
 	STA PPUADDR
-	LDA #$E9
+	LDA #$A7
 	STA PPUADDR
-	LDX #$05
+	LDX #$03
 	STX PPUDATA
 
 	LDA PPUSTATUS ; R
 	LDA #$21
 	STA PPUADDR
-	LDA #$EA
+	LDA #$A9
 	STA PPUADDR
-	LDX #$15
+	LDX #$04
 	STX PPUDATA
 
 	LDA PPUSTATUS ; I
 	LDA #$21
 	STA PPUADDR
-	LDA #$EB
+	LDA #$AB
 	STA PPUADDR
-	LDX #$0C
+	LDX #$05
 	STX PPUDATA
 
 	LDA PPUSTATUS ; E
 	LDA #$21
 	STA PPUADDR
-	LDA #$EC
+	LDA #$AD
 	STA PPUADDR
-	LDX #$08
+	LDX #$06
 	STX PPUDATA
 
 	LDA PPUSTATUS ; L
 	LDA #$21
 	STA PPUADDR
-	LDA #$ED
+	LDA #$AF
 	STA PPUADDR
-	LDX #$0F
+	LDX #$07
 	STX PPUDATA
 
 	LDA PPUSTATUS ; V
 	LDA #$21
 	STA PPUADDR
-	LDA #$F1
+	LDA #$B5
 	STA PPUADDR
-	LDX #$19
+	LDX #$08
 	STX PPUDATA
 
 	LDA PPUSTATUS ; I
 	LDA #$21
 	STA PPUADDR
-	LDA #$F2
+	LDA #$B7
 	STA PPUADDR
-	LDX #$0C
+	LDX #$05
 	STX PPUDATA
 
 	LDA PPUSTATUS ; E
 	LDA #$21
 	STA PPUADDR
-	LDA #$F3
+	LDA #$B9
 	STA PPUADDR
-	LDX #$08
+	LDX #$06
 	STX PPUDATA
 
 	LDA PPUSTATUS ; R
 	LDA #$21
 	STA PPUADDR
-	LDA #$F4
+	LDA #$BB
 	STA PPUADDR
-	LDX #$15
+	LDX #$04
 	STX PPUDATA
 
 	LDA PPUSTATUS ;A
 	LDA #$21
 	STA PPUADDR
-	LDA #$F5
+	LDA #$BD
 	STA PPUADDR
-	LDX #$04
+	LDX #$02
 	STX PPUDATA
 
 	; Attribute table
 	LDA PPUSTATUS
 	LDA #$23
 	STA PPUADDR
+	LDA #$D8
+	STA PPUADDR
+	LDA #%00001000
+	STA PPUDATA
+
+	LDA PPUSTATUS
+	LDA #$23
+	STA PPUADDR
 	LDA #$D9
 	STA PPUADDR
-	LDA #%11000000
+	LDA #%00000001
 	STA PPUDATA
 
 	LDA PPUSTATUS
@@ -189,15 +197,15 @@ load_tiles:
 	STA PPUADDR
 	LDA #$DA
 	STA PPUADDR
-	LDA #%01100000
+	LDA #%00000110
 	STA PPUDATA
 
 	LDA PPUSTATUS
 	LDA #$23
 	STA PPUADDR
-	LDA #$DC
+	LDA #$DB
 	STA PPUADDR
-	LDA #%10001011
+	LDA #%00001000
 	STA PPUDATA
 
 	LDA PPUSTATUS
@@ -205,7 +213,23 @@ load_tiles:
 	STA PPUADDR
 	LDA #$DD
 	STA PPUADDR
-	LDA #%00010000
+	LDA #%00000001
+	STA PPUDATA
+
+	LDA PPUSTATUS
+	LDA #$23
+	STA PPUADDR
+	LDA #$DE
+	STA PPUADDR
+	LDA #%00000110
+	STA PPUDATA
+
+	LDA PPUSTATUS
+	LDA #$23
+	STA PPUADDR
+	LDA #$DF
+	STA PPUADDR
+	LDA #%00000000
 	STA PPUDATA
 
 vblankwait: ; wait for another vblank before continuing
@@ -227,10 +251,10 @@ forever:
 .segment "RODATA"
 palettes: 
   ; Background Palette
-  .byte $0f, $12, $23, $27
-  .byte $0f, $2b, $3c, $39
-  .byte $0f, $0c, $07, $13
-  .byte $0f, $19, $09, $29
+  .byte $0f, $21, $11, $01
+  .byte $0f, $25, $15, $05  
+  .byte $0f, $29, $19, $09
+  .byte $0f, $24, $14, $04
 
   ; Sprite Palette  %notice that the first palette contains the white color in the second element
   .byte $0f, $21, $11, $01
@@ -239,4 +263,4 @@ palettes:
   .byte $0f, $24, $14, $04
 
 .segment "CHR"
-.incbin "starfield.chr"
+.incbin "letters.chr"
