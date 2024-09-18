@@ -2,11 +2,11 @@ Project Structure:\
    | \
    |-- nes.cfg \
    |-- src \
-      | \
-      |-- constants.inc \
-      |-- demo.s \
-      |-- tiles.chr \
+   &nbsp;| \
+   &nbsp;|-- constants.inc \
+   &nbsp;|-- demo.s \
+   &nbsp;|-- tiles.chr \
 
 To assemble and link the code, use the following commands : \
-   ca65 src/demo.s \
-   ld65 src/demo.o -C nes.cfg -o demo.nes \
+&nbsp;ca65 src/demo.s \
+&nbsp;ld65 src/demo.o -C nes.cfg -o demo.nes
